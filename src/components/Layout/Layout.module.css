@@ -1,0 +1,36 @@
+header {
+  background-color: yellowgreen;
+  color: white;
+  border-bottom: 1px solid #d6d5d5;
+  justify-content: flex-start;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+}
+
+footer {
+  background-color: yellowgreen;
+  color: black;
+  border-bottom: 1px solid #d6d5d5;
+  justify-content: flex-end;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+}
+
+.page {
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.sideNavbar {
+  background-color: rgb(250, 232, 222);
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
