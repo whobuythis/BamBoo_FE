@@ -1,7 +1,6 @@
 import PostCard from "../PostCard/PostCard";
 
-const PostList = (props) => {
-  // console.log(props.title);
+const PostList = () => {
   return <PostCard sendMessage="From PostList" />;
 };
 
