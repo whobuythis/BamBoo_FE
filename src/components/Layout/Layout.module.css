@@ -21,7 +21,6 @@ footer {
 }
 
 .page {
-  border: 1px solid black;
   display: flex;
   flex-direction: row;
   min-height: 100vh;
@@ -33,4 +32,29 @@ footer {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.sidebarItem {
+  font-size: 0.9rem;
+  padding-bottom: 0.5rem;
+  text-align: left;
+}
+
+.sidebarItem .sidebarLink {
+  text-decoration: none;
+  color: rgb(102, 102, 102);
+  padding: 0.5rem;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebarItem .sidebarLink:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  color: rgb(0, 0, 0);
+}
+
+@media (min-width: 768px) {
+  .sideNavbar {
+    width: 300px;
+  }
 }
