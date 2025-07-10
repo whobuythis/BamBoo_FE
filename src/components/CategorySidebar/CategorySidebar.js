@@ -12,8 +12,25 @@ const categories = [
 const CategorySidebar = ({ selectedCategory, onCategoryChange }) => {
   return (
     <div className="category-sidebar">
-      <div className="category-header"></div>
-      <h3>카테고리</h3>
+      <div className="category-header">
+        <h3>카테고리</h3>
+      </div>
+      <div className="category-list">
+        {categories.map((category) => (
+          <button
+            key={category.value}
+            className={`category-item ${
+              selectedCategory === category.value ? "active" : ""
+            }`}
+            onClick={() => onCategoryChange(category.value)}
+          >
+            <span className="category-icon">{category.icon}</span>
+            <span className="category-label">{category.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
+
+export default CategorySidebar;
