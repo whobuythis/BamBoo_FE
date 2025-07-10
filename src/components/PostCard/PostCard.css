@@ -1,0 +1,19 @@
+.post-card {
+  border: 1px solid black;
+}
+
+.post-meta {
+  background-color: yellowgreen;
+  display: flex;
+  justify-content: space-between;
+}
+
+.post-actions {
+  background-color: bisque;
+  display: flex;
+  justify-content: space-between;
+}
+
+.post-stats {
+  border: 1px solid green;
+}
