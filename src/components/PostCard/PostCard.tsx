@@ -1,7 +1,15 @@
 "use client";
+
+import type React from "react";
+import type { Post } from "../../types";
 import "./PostCard.css";
 
-const getCategoryColor = (category) => {
+interface PostCardProps {
+  post: Post;
+  onLike: (postId: number) => void;
+}
+
+const getCategoryColor = (category: string): string => {
   switch (category) {
     case "공지사항":
       return "category-notice";
@@ -16,7 +24,11 @@ const getCategoryColor = (category) => {
   }
 };
 
-const PostCard = ({ post, onLike }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
+  const handleLikeClick = (): void => {
+    onLike(post.id);
+  };
+
   return (
     <div className="post-card">
       <div className="post-header">
@@ -37,7 +49,7 @@ const PostCard = ({ post, onLike }) => {
         <div className="post-stats">
           <button
             className={`stat-button ${post.isLiked ? "liked" : ""}`}
-            onClick={() => onLike(post.id)}
+            onClick={handleLikeClick}
           >
             <span className="stat-icon">{post.isLiked ? "❤️" : "🤍"}</span>
             <span>{post.likes}</span>

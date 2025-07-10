@@ -1,7 +1,15 @@
+import type React from "react";
 import PostCard from "../PostCard/PostCard";
+import type { Post } from "../../types";
 import "./PostList.css";
 
-const PostList = ({ posts, searchQuery, onLike }) => {
+interface PostListProps {
+  posts: Post[];
+  searchQuery: string;
+  onLike: (postId: number) => void;
+}
+
+const PostList: React.FC<PostListProps> = ({ posts, searchQuery, onLike }) => {
   if (posts.length === 0) {
     return (
       <div className="empty-state">

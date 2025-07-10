@@ -1,14 +1,16 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Header from "./components/Header/Header"
-import CategorySidebar from "./components/CategorySidebar/CategorySidebar"
-import Statistics from "./components/Statistics/Statistics"
-import PostList from "./components/PostList/PostList"
-import WritePostModal from "./components/WritePostModal/WritePostModal"
-import "./App.css"
+import type React from "react";
+import { useState } from "react";
+import Header from "./components/Header/Header";
+import CategorySidebar from "./components/CategorySidebar/CategorySidebar";
+import Statistics from "./components/Statistics/Statistics";
+import PostList from "./components/PostList/PostList";
+import WritePostModal from "./components/WritePostModal/WritePostModal";
+import type { Post, NewPost } from "./types";
+import "./App.css";
 
-const initialPosts = [
+const initialPosts: Post[] = [
   {
     id: 0,
     title: "[공지] BamBoo하우스 이용 안내",
@@ -45,7 +47,8 @@ const initialPosts = [
   {
     id: 3,
     title: "야근이 너무 많아서 힘들어요",
-    content: "요즘 프로젝트 데드라인 때문에 야근이 너무 많습니다. 다들 어떻게 워라밸을 맞추고 계신가요?",
+    content:
+      "요즘 프로젝트 데드라인 때문에 야근이 너무 많습니다. 다들 어떻게 워라밸을 맞추고 계신가요?",
     category: "일반",
     timestamp: "6시간 전",
     likes: 24,
@@ -55,7 +58,8 @@ const initialPosts = [
   {
     id: 4,
     title: "SQL 쿼리 최적화 팁 공유",
-    content: "대용량 데이터 처리할 때 쿼리 성능 개선 방법들을 정리해봤습니다. 인덱스 활용법과 조인 최적화 등...",
+    content:
+      "대용량 데이터 처리할 때 쿼리 성능 개선 방법들을 정리해봤습니다. 인덱스 활용법과 조인 최적화 등...",
     category: "데이터 분석팀",
     timestamp: "1일 전",
     likes: 18,
@@ -73,46 +77,61 @@ const initialPosts = [
     comments: 9,
     isLiked: true,
   },
-]
+];
 
-function App() {
-  const [posts, setPosts] = useState(initialPosts)
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [username, setUsername] = useState("")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isWriteModalOpen, setIsWriteModalOpen] = useState(false)
+const App: React.FC = () => {
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
 
   const filteredPosts = posts.filter((post) => {
-    const matchesCategory = selectedCategory === "all" || post.category === selectedCategory
+    const matchesCategory =
+      selectedCategory === "all" || post.category === selectedCategory;
     const matchesSearch =
       searchQuery === "" ||
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+      post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  const handleLike = (postId) => {
+  const handleLike = (postId: number): void => {
     setPosts(
       posts.map((post) =>
         post.id === postId
-          ? { ...post, likes: post.isLiked ? post.likes - 1 : post.likes + 1, isLiked: !post.isLiked }
-          : post,
-      ),
-    )
-  }
+          ? {
+              ...post,
+              likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+              isLiked: !post.isLiked,
+            }
+          : post
+      )
+    );
+  };
 
-  const handleAddPost = (newPost) => {
-    const post = {
+  const handleAddPost = (newPost: NewPost): void => {
+    const post: Post = {
       id: posts.length + 1,
       ...newPost,
       timestamp: "방금 전",
       likes: 0,
       comments: 0,
       isLiked: false,
-    }
-    setPosts([post, ...posts])
-  }
+    };
+    setPosts([post, ...posts]);
+  };
+
+  const handleLogin = (): void => {
+    setIsLoggedIn(true);
+    setUsername("익명사용자");
+  };
+
+  const handleLogout = (): void => {
+    setIsLoggedIn(false);
+    setUsername("");
+  };
 
   return (
     <div className="app">
@@ -121,33 +140,38 @@ function App() {
         username={username}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onLogin={() => {
-          setIsLoggedIn(true)
-          setUsername("익명사용자")
-        }}
-        onLogout={() => {
-          setIsLoggedIn(false)
-          setUsername("")
-        }}
+        onLogin={handleLogin}
+        onLogout={handleLogout}
         onOpenWriteModal={() => setIsWriteModalOpen(true)}
       />
 
       <div className="main-container">
         <div className="content-grid">
           <div className="sidebar">
-            <CategorySidebar selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+            <CategorySidebar
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
             <Statistics posts={posts} />
           </div>
 
           <div className="main-content">
-            <PostList posts={filteredPosts} searchQuery={searchQuery} onLike={handleLike} />
+            <PostList
+              posts={filteredPosts}
+              searchQuery={searchQuery}
+              onLike={handleLike}
+            />
           </div>
         </div>
       </div>
 
-      <WritePostModal isOpen={isWriteModalOpen} onClose={() => setIsWriteModalOpen(false)} onSubmit={handleAddPost} />
+      <WritePostModal
+        isOpen={isWriteModalOpen}
+        onClose={() => setIsWriteModalOpen(false)}
+        onSubmit={handleAddPost}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
