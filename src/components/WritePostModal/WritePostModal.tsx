@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import type React from "react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+import type { NewPost } from "../../types";
 import "./WritePostModal.css";
 
-const WritePostModal = ({ isOpen, onClose, onSubmit }) => {
-  const [formData, setFormData] = useState({
+interface WritePostModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (post: NewPost) => void;
+}
+
+const WritePostModal: React.FC<WritePostModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+}) => {
+  const [formData, setFormData] = useState<NewPost>({
     title: "",
     content: "",
     category: "",
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (formData.title && formData.content && formData.category) {
       onSubmit(formData);
@@ -19,22 +31,34 @@ const WritePostModal = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ): void => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    e.stopPropagation();
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-content" onClick={handleContentClick}>
         <div className="modal-header">
           <h2>새 글 작성</h2>
           <p>익명으로 고민이나 이야기를 공유해보세요.</p>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={onClose} type="button">
             ✕
           </button>
         </div>

@@ -1,7 +1,15 @@
 "use client";
+
+import type React from "react";
+import type { Category } from "../../types";
 import "./CategorySidebar.css";
 
-const categories = [
+interface CategorySidebarProps {
+  selectedCategory: string;
+  onCategoryChange: (category: string) => void;
+}
+
+const categories: Category[] = [
   { value: "all", label: "전체", icon: "📋" },
   { value: "공지사항", label: "공지사항", icon: "📢" },
   { value: "웹 개발팀", label: "웹 개발팀", icon: "👥" },
@@ -9,7 +17,14 @@ const categories = [
   { value: "일반", label: "일반", icon: "☕" },
 ];
 
-const CategorySidebar = ({ selectedCategory, onCategoryChange }) => {
+const CategorySidebar: React.FC<CategorySidebarProps> = ({
+  selectedCategory,
+  onCategoryChange,
+}) => {
+  const handleCategoryClick = (categoryValue: string): void => {
+    onCategoryChange(categoryValue);
+  };
+
   return (
     <div className="category-sidebar">
       <div className="category-header">
@@ -22,7 +37,7 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange }) => {
             className={`category-item ${
               selectedCategory === category.value ? "active" : ""
             }`}
-            onClick={() => onCategoryChange(category.value)}
+            onClick={() => handleCategoryClick(category.value)}
           >
             <span className="category-icon">{category.icon}</span>
             <span className="category-label">{category.label}</span>

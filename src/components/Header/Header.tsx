@@ -1,7 +1,20 @@
 "use client";
+
+import type React from "react";
+import type { ChangeEvent } from "react";
 import "./Header.css";
 
-const Header = ({
+interface HeaderProps {
+  isLoggedIn: boolean;
+  username: string;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+  onLogin: () => void;
+  onLogout: () => void;
+  onOpenWriteModal: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({
   isLoggedIn,
   username,
   searchQuery,
@@ -10,6 +23,10 @@ const Header = ({
   onLogout,
   onOpenWriteModal,
 }) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    onSearchChange(e.target.value);
+  };
+
   return (
     <header className="header">
       <div className="header-container">
@@ -32,8 +49,8 @@ const Header = ({
               type="text"
               placeholder="게시글 검색..."
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="sear-input"
+              onChange={handleSearchChange}
+              className="search-input"
             />
           </div>
         </div>
