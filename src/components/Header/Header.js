@@ -33,7 +33,7 @@ const Header = ({
               placeholder="게시글 검색..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="sear-input"
+              className="search-input"
             />
           </div>
         </div>
