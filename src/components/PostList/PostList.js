@@ -1,7 +1,7 @@
 import PostCard from "../PostCard/PostCard";
 
 const PostList = () => {
-  return <PostCard sendMessage="From PostList" />;
+  return <PostCard />;
 };
 
 export default PostList;
