@@ -1,7 +1,13 @@
+import type React from "react";
+import type { Post } from "../../types";
 import "./Statistics.css";
 
-const Statistics = ({ posts }) => {
-  const getPostCountByCategory = (category) => {
+interface StatisticsProps {
+  posts: Post[];
+}
+
+const Statistics: React.FC<StatisticsProps> = ({ posts }) => {
+  const getPostCountByCategory = (category: string): number => {
     return posts.filter((post) => post.category === category).length;
   };
 
