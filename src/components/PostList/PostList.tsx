@@ -43,6 +43,7 @@ const PostList = ({ posts, searchQuery, onLike }: PostListProps) => {
     <div className="post-list">
       {posts.map((post) => (
         <PostCard key={post.id} post={post} onLike={onLike} />
+        //이 props들을 PostCard에게 넘겨줌
       ))}
     </div>
   );
