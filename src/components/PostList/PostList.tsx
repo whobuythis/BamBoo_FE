@@ -14,8 +14,8 @@ interface PostListProps {
 }
 
 //컴포넌트 PostList
-//const PostList: React.FC<PostListProps> = ({ posts, searchQuery, onLike }) => {
-const PostList = ({ posts, searchQuery, onLike }: PostListProps) => {
+const PostList: React.FC<PostListProps> = ({ posts, searchQuery, onLike }) => {
+  //const PostList = ({ posts, searchQuery, onLike }: PostListProps) => {
   if (posts.length === 0) {
     //검색결과가 없을 때
     return (
