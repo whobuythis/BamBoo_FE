@@ -7,6 +7,8 @@ import "./PostList.css";
 //props의 타입만 정의할 것이므로 class가 아닌(인터페이스 생성) interface가 적절
 interface PostListProps {
   posts: Post[]; //types의 index.ts에서 가져온다
+  //Post: 게시글 하나의 구조를 정의
+  //Post[]: Post 객체들이 들어있는 배열
   searchQuery: string;
   onLike: (postId: number) => void;
 }
@@ -42,8 +44,19 @@ const PostList = ({ posts, searchQuery, onLike }: PostListProps) => {
   return (
     <div className="post-list">
       {posts.map((post) => (
+        //array.map((item, index, array)
+        // item: 배열 요소 하나
+        // index: 그 요소의 인덱스 (0, 1, 2, ...)
+        // array: 원래 배열 전체
+
         <PostCard key={post.id} post={post} onLike={onLike} />
-        //이 props들을 PostCard에게 넘겨줌
+        //이 props들을 PostCard에 넘겨줌
+        /*리액트는 부모 → 자식으로만 데이터가 흐른다. (단방향 데이터 흐름)
+          그리고 상태(state)는 상위 컴포넌트에서 관리하고
+          하위 컴포넌트는 그 상태를 읽기만 할 수 있다. */
+
+        //post= 자식 컴포넌트에서 사용할 props 이름
+        //{post} 지금 부모 컴포넌트 안에서 쓰고 있는 변수
       ))}
     </div>
   );
