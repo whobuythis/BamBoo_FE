@@ -7,6 +7,8 @@ import "./PostList.css";
 //props의 타입만 정의할 것이므로 class가 아닌(인터페이스 생성) interface가 적절
 interface PostListProps {
   posts: Post[]; //types의 index.ts에서 가져온다
+  //Post: 게시글 하나의 구조를 정의
+  //Post[]: Post 객체들이 들어있는 배열
   searchQuery: string;
   onLike: (postId: number) => void;
 }
