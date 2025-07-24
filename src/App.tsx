@@ -1,7 +1,8 @@
-"use client";
-
+"use client"; // Next.js에서 클라이언트 컴포넌트임을 명시
 import type React from "react";
 import { useState } from "react";
+
+// 주요 컴포넌트들 import
 import Header from "./components/Header/Header";
 import CategorySidebar from "./components/CategorySidebar/CategorySidebar";
 import Statistics from "./components/Statistics/Statistics";
@@ -10,6 +11,7 @@ import WritePostModal from "./components/WritePostModal/WritePostModal";
 import type { Post, NewPost } from "./types";
 import "./App.css";
 
+// 초기 게시글 더미 데이터
 const initialPosts: Post[] = [
   {
     id: 0,
@@ -79,14 +81,21 @@ const initialPosts: Post[] = [
   },
 ];
 
+// App 컴포넌트 정의
 const App: React.FC = () => {
+  // 게시글 상태
   const [posts, setPosts] = useState<Post[]>(initialPosts);
+  // 현재 선택된 카테고리
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  // 로그인 상태
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
+  // 검색어
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // 글쓰기 모달 상태
   const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
 
+  // 카테고리 & 검색어 기반으로 필터링된 게시글 목록
   const filteredPosts = posts.filter((post) => {
     const matchesCategory =
       selectedCategory === "all" || post.category === selectedCategory;
@@ -97,6 +106,7 @@ const App: React.FC = () => {
     return matchesCategory && matchesSearch;
   });
 
+  // 좋아요 토글 핸들러
   const handleLike = (postId: number): void => {
     setPosts(
       posts.map((post) =>
@@ -111,6 +121,7 @@ const App: React.FC = () => {
     );
   };
 
+  // 새 글 추가 핸들러
   const handleAddPost = (newPost: NewPost): void => {
     const post: Post = {
       id: posts.length + 1,
@@ -120,14 +131,16 @@ const App: React.FC = () => {
       comments: 0,
       isLiked: false,
     };
-    setPosts([post, ...posts]);
+    setPosts([post, ...posts]); // 최신 글이 위로 오도록
   };
 
+  // 로그인 핸들러
   const handleLogin = (): void => {
     setIsLoggedIn(true);
     setUsername("익명사용자");
   };
 
+  // 로그아웃 핸들러
   const handleLogout = (): void => {
     setIsLoggedIn(false);
     setUsername("");
@@ -135,6 +148,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
+      {/* 상단 헤더: 로그인 상태, 검색창, 글쓰기 버튼 */}
       <Header
         isLoggedIn={isLoggedIn}
         username={username}
@@ -144,10 +158,11 @@ const App: React.FC = () => {
         onLogout={handleLogout}
         onOpenWriteModal={() => setIsWriteModalOpen(true)}
       />
-
+      {/* 메인 컨텐츠 */}
       <div className="main-container">
         <div className="content-grid">
           <div className="sidebar">
+            {/* 왼쪽 사이드바: 카테고리 선택 + 통계 */}
             <CategorySidebar
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
@@ -155,6 +170,7 @@ const App: React.FC = () => {
             <Statistics posts={posts} />
           </div>
 
+          {/* 오른쪽: 게시글 목록 */}
           <div className="main-content">
             <PostList
               posts={filteredPosts}
@@ -165,6 +181,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
+      {/* 글쓰기 모달 */}
       <WritePostModal
         isOpen={isWriteModalOpen}
         onClose={() => setIsWriteModalOpen(false)}
