@@ -21,10 +21,6 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
   selectedCategory,
   onCategoryChange,
 }) => {
-  const handleCategoryClick = (categoryValue: string): void => {
-    onCategoryChange(categoryValue);
-  };
-
   return (
     <div className="category-sidebar">
       <div className="category-header">
@@ -37,7 +33,7 @@ const CategorySidebar: React.FC<CategorySidebarProps> = ({
             className={`category-item ${
               selectedCategory === category.value ? "active" : ""
             }`}
-            onClick={() => handleCategoryClick(category.value)}
+            onClick={() => onCategoryChange(category.value)}
           >
             <span className="category-icon">{category.icon}</span>
             <span className="category-label">{category.label}</span>

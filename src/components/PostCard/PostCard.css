@@ -1,0 +1,149 @@
+.post-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+  overflow: hidden;
+}
+
+.post-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  padding: 1.5rem;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.category-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.category-notice {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.category-web {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.category-data {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.category-general {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.category-default {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.post-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.author-name {
+  font-weight: 500;
+  color: #374151;
+}
+
+.post-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.time-icon {
+  font-size: 0.75rem;
+}
+
+.post-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.post-content {
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.post-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-stats {
+  display: flex;
+  gap: 1rem;
+}
+
+.stat-button {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s;
+}
+
+.stat-button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.stat-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stat-button.liked {
+  color: #dc2626;
+}
+
+.stat-icon {
+  font-size: 1rem;
+}
+
+.detail-button {
+  padding: 0.5rem 1rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  color: #374151;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.detail-button:hover {
+  background: #f9fafb;
+}
