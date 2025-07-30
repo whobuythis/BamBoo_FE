@@ -1,15 +1,21 @@
 import type React from "react";
 import PostCard from "../PostCard/PostCard";
-import type { Post } from "../../types";
+import type { Post, User } from "../../types";
 import "./PostList.css";
 
 interface PostListProps {
   posts: Post[];
   searchQuery: string;
-  onLike: (postId: number) => void;
+  onLike: (postId: string) => void;
+  currentUser: User | null;
 }
 
-const PostList: React.FC<PostListProps> = ({ posts, searchQuery, onLike }) => {
+const PostList: React.FC<PostListProps> = ({
+  posts,
+  searchQuery,
+  onLike,
+  currentUser,
+}) => {
   if (posts.length === 0) {
     return (
       <div className="empty-state">
@@ -34,7 +40,12 @@ const PostList: React.FC<PostListProps> = ({ posts, searchQuery, onLike }) => {
   return (
     <div className="post-list">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} onLike={onLike} />
+        <PostCard
+          key={post.id}
+          post={post}
+          onLike={onLike}
+          currentUser={currentUser}
+        />
       ))}
     </div>
   );

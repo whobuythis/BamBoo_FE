@@ -1,76 +1,98 @@
 "use client";
 
 import type React from "react";
-import type { ChangeEvent } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 import "./Header.css";
 
 interface HeaderProps {
-  isLoggedIn: boolean;
-  username: string;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-  onLogin: () => void;
-  onLogout: () => void;
-  onOpenWriteModal: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  onOpenWriteModal?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
-  isLoggedIn,
-  username,
-  searchQuery,
+  searchQuery = "",
   onSearchChange,
-  onLogin,
-  onLogout,
   onOpenWriteModal,
 }) => {
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    onSearchChange(e.target.value);
+  const { currentUser, logout } = useAuth();
+  const navigate = useNavigate();
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalSearchQuery(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+    }
   };
 
   return (
     <header className="header">
       <div className="header-container">
         <div className="header-left">
-          <div className="logo">
+          <Link to="/" className="logo">
             <div className="logo-icon">💬</div>
             <div className="logo-text">
               <h1>BamBoo하우스</h1>
               <p>
-                {isLoggedIn ? `${username}님, 안녕하세요!` : "익명 소통 공간"}
+                {currentUser
+                  ? `${currentUser.displayName}님, 안녕하세요!`
+                  : "익명 소통 공간"}
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <span className="search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="게시글 검색..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="search-input"
-            />
+        {onSearchChange && (
+          <div className="search-container">
+            <div className="search-input-wrapper">
+              <span className="search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="게시글 검색..."
+                value={localSearchQuery}
+                onChange={handleSearchChange}
+                className="search-input"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="header-actions">
-          <button className="btn btn-primary" onClick={onOpenWriteModal}>
-            ✏️ 글쓰기
-          </button>
+          {currentUser && onOpenWriteModal && (
+            <button className="btn btn-primary" onClick={onOpenWriteModal}>
+              ✏️ 글쓰기
+            </button>
+          )}
 
-          {isLoggedIn ? (
+          {currentUser ? (
             <>
               <button className="btn btn-outline">👤 마이페이지</button>
-              <button className="btn btn-ghost" onClick={onLogout}>
+              <button className="btn btn-ghost" onClick={handleLogout}>
                 🚪 로그아웃
               </button>
             </>
           ) : (
-            <button className="btn btn-outline" onClick={onLogin}>
-              로그인
-            </button>
+            <>
+              <Link to="/login" className="btn btn-outline">
+                로그인
+              </Link>
+              <Link to="/register" className="btn btn-primary">
+                회원가입
+              </Link>
+            </>
           )}
         </div>
       </div>

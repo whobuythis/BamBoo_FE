@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, type FormEvent, type ChangeEvent } from "react";
+import { useState } from "react";
 import type { NewPost } from "../../types";
 import "./WritePostModal.css";
 
@@ -21,40 +21,49 @@ const WritePostModal: React.FC<WritePostModalProps> = ({
     content: "",
     category: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.title && formData.content && formData.category) {
-      onSubmit(formData);
+    if (
+      !formData.title.trim() ||
+      !formData.content.trim() ||
+      !formData.category
+    )
+      return;
+
+    try {
+      setIsSubmitting(true);
+      await onSubmit({
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        category: formData.category,
+      });
       setFormData({ title: "", content: "", category: "" });
       onClose();
+    } catch (error) {
+      console.error("게시글 작성 실패:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ): void => {
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleContentClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-    e.stopPropagation();
-  };
-
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content" onClick={handleContentClick}>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>새 글 작성</h2>
           <p>익명으로 고민이나 이야기를 공유해보세요.</p>
@@ -111,8 +120,12 @@ const WritePostModal: React.FC<WritePostModalProps> = ({
             <button type="button" className="btn btn-outline" onClick={onClose}>
               취소
             </button>
-            <button type="submit" className="btn btn-primary">
-              게시하기
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "작성 중..." : "게시하기"}
             </button>
           </div>
         </form>
