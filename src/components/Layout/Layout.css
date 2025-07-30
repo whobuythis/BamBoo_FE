@@ -1,0 +1,11 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px; /* Header 높이만큼 여백 */
+} 

@@ -7,6 +7,7 @@ interface PostListProps {
   posts: Post[];
   searchQuery: string;
   onLike: (postId: string) => void;
+  onCommentAdded?: (postId: string) => void;
   currentUser: User | null;
 }
 
@@ -14,6 +15,7 @@ const PostList: React.FC<PostListProps> = ({
   posts,
   searchQuery,
   onLike,
+  onCommentAdded,
   currentUser,
 }) => {
   if (posts.length === 0) {
@@ -44,6 +46,7 @@ const PostList: React.FC<PostListProps> = ({
           key={post.id}
           post={post}
           onLike={onLike}
+          onCommentAdded={onCommentAdded}
           currentUser={currentUser}
         />
       ))}

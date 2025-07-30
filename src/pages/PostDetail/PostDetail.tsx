@@ -16,6 +16,12 @@ const PostDetail: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    content: "",
+    category: "",
+  });
 
   const loadPostAndComments = useCallback(async () => {
     if (!id) return;
@@ -30,6 +36,11 @@ const PostDetail: React.FC = () => {
 
       if (postData) {
         setPost(postData);
+        setEditForm({
+          title: postData.title,
+          content: postData.content,
+          category: postData.category,
+        });
         setComments(commentsData);
       } else {
         setError("게시글을 찾을 수 없습니다.");
@@ -92,6 +103,71 @@ const PostDetail: React.FC = () => {
     }
   };
 
+  const handleUpdateComment = async (commentId: string, content: string) => {
+    if (!currentUser || !post) return;
+
+    try {
+      const { commentService } = await import("../../services/postService");
+      await commentService.updateComment(commentId, { content });
+
+      const updatedComments = await commentService.getCommentsByPost(post.id);
+      setComments(updatedComments);
+    } catch (error) {
+      console.error("댓글 수정 실패:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!currentUser || !post) return;
+
+    try {
+      const { commentService } = await import("../../services/postService");
+      await commentService.deleteComment(commentId, post.id);
+
+      const updatedComments = await commentService.getCommentsByPost(post.id);
+      setComments(updatedComments);
+
+      setPost({
+        ...post,
+        commentsCount: post.commentsCount - 1,
+      });
+    } catch (error) {
+      console.error("댓글 삭제 실패:", error);
+    }
+  };
+
+  const handleEditPost = async () => {
+    if (!post || !currentUser || post.authorId !== currentUser.uid) return;
+
+    try {
+      const { postService } = await import("../../services/postService");
+      await postService.updatePost(post.id, editForm);
+
+      setPost({
+        ...post,
+        ...editForm,
+        updatedAt: new Date() as any,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("게시글 수정 실패:", error);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    if (!post || !currentUser || post.authorId !== currentUser.uid) return;
+
+    if (!window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+
+    try {
+      const { postService } = await import("../../services/postService");
+      await postService.deletePost(post.id);
+      navigate("/");
+    } catch (error) {
+      console.error("게시글 삭제 실패:", error);
+    }
+  };
+
   const formatDate = (timestamp: any): string => {
     if (!timestamp) return "";
 
@@ -136,6 +212,7 @@ const PostDetail: React.FC = () => {
   }
 
   const isLiked = currentUser ? post.likes.includes(currentUser.uid) : false;
+  const isAuthor = currentUser && post.authorId === currentUser.uid;
 
   return (
     <div className="post-detail-page">
@@ -155,14 +232,56 @@ const PostDetail: React.FC = () => {
               <div className="post-info">
                 <span className="author-name">{post.authorName}</span>
                 <span className="post-date">{formatDate(post.createdAt)}</span>
+                {post.updatedAt && post.updatedAt !== post.createdAt && (
+                  <span className="post-updated">(수정됨)</span>
+                )}
               </div>
             </div>
-            <h1 className="post-title">{post.title}</h1>
+            
+            {isEditing ? (
+              <div className="edit-form">
+                <input
+                  type="text"
+                  value={editForm.title}
+                  onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+                  className="edit-title-input"
+                  placeholder="제목을 입력하세요"
+                />
+                <textarea
+                  value={editForm.content}
+                  onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+                  className="edit-content-input"
+                  placeholder="내용을 입력하세요"
+                  rows={10}
+                />
+                <select
+                  value={editForm.category}
+                  onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                  className="edit-category-select"
+                >
+                  <option value="일반">일반</option>
+                  <option value="공지사항">공지사항</option>
+                  <option value="웹 개발팀">웹 개발팀</option>
+                  <option value="데이터 분석팀">데이터 분석팀</option>
+                </select>
+                <div className="edit-actions">
+                  <button onClick={handleEditPost} className="btn btn-primary">
+                    수정 완료
+                  </button>
+                  <button onClick={() => setIsEditing(false)} className="btn btn-outline">
+                    취소
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1 className="post-title">{post.title}</h1>
+                <div className="post-content">
+                  <p>{post.content}</p>
+                </div>
+              </>
+            )}
           </header>
-
-          <div className="post-content">
-            <p>{post.content}</p>
-          </div>
 
           <div className="post-actions">
             <div className="post-stats">
@@ -179,12 +298,31 @@ const PostDetail: React.FC = () => {
                 <span>댓글 {post.commentsCount}</span>
               </div>
             </div>
+            
+            {isAuthor && (
+              <div className="author-actions">
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="btn btn-outline"
+                >
+                  ✏️ 수정
+                </button>
+                <button
+                  onClick={handleDeletePost}
+                  className="btn btn-danger"
+                >
+                  🗑️ 삭제
+                </button>
+              </div>
+            )}
           </div>
         </article>
 
         <CommentSection
           comments={comments}
           onAddComment={handleAddComment}
+          onUpdateComment={handleUpdateComment}
+          onDeleteComment={handleDeleteComment}
           currentUser={currentUser}
         />
       </div>

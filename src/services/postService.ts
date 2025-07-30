@@ -63,6 +63,37 @@ export const postService = {
     return null;
   },
 
+  async updatePost(
+    postId: string,
+    updates: Partial<{ title: string; content: string; category: string }>
+  ): Promise<void> {
+    const { db } = await import("../config/firebase");
+    const postRef = doc(db, "posts", postId);
+    await updateDoc(postRef, {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    });
+  },
+
+  async deletePost(postId: string): Promise<void> {
+    const { db } = await import("../config/firebase");
+    
+    // 먼저 해당 게시글의 모든 댓글을 삭제
+    const commentsQuery = query(
+      collection(db, "comments"),
+      where("postId", "==", postId)
+    );
+    const commentsSnapshot = await getDocs(commentsQuery);
+    
+    const deletePromises = commentsSnapshot.docs.map((commentDoc) =>
+      deleteDoc(doc(db, "comments", commentDoc.id))
+    );
+    
+    // 댓글들을 모두 삭제한 후 게시글 삭제
+    await Promise.all(deletePromises);
+    await deleteDoc(doc(db, "posts", postId));
+  },
+
   async toggleLike(postId: string, userId: string): Promise<void> {
     const { db } = await import("../config/firebase");
     const postRef = doc(db, "posts", postId);
@@ -134,20 +165,39 @@ export const commentService = {
 
   async getCommentsByPost(postId: string): Promise<Comment[]> {
     const { db } = await import("../config/firebase");
+    // 복합 인덱스 문제를 해결하기 위해 orderBy를 제거하고 클라이언트에서 정렬
     const q = query(
       collection(db, "comments"),
-      where("postId", "==", postId),
-      orderBy("createdAt", "asc")
+      where("postId", "==", postId)
     );
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map(
+    const comments = querySnapshot.docs.map(
       (doc) =>
         ({
           id: doc.id,
           ...doc.data(),
         } as Comment)
     );
+
+    // 클라이언트에서 정렬
+    return comments.sort((a, b) => {
+      const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : (a.createdAt as any).seconds * 1000;
+      const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : (b.createdAt as any).seconds * 1000;
+      return aTime - bTime; // 오름차순 정렬
+    });
+  },
+
+  async updateComment(
+    commentId: string,
+    updates: Partial<{ content: string }>
+  ): Promise<void> {
+    const { db } = await import("../config/firebase");
+    const commentRef = doc(db, "comments", commentId);
+    await updateDoc(commentRef, {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    });
   },
 
   async deleteComment(commentId: string, postId: string): Promise<void> {

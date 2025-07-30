@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import CategorySidebar from "../../components/CategorySidebar/CategorySidebar";
 import Statistics from "../../components/Statistics/Statistics";
@@ -19,11 +19,7 @@ const Home: React.FC = () => {
   const [isWriteModalOpen, setIsWriteModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     try {
       setLoading(true);
       const fetchedPosts = await postService.getAllPosts();
@@ -33,7 +29,11 @@ const Home: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
 
   const filteredPosts = posts.filter((post) => {
     const matchesCategory =
@@ -69,6 +69,28 @@ const Home: React.FC = () => {
       console.error("좋아요 실패:", error);
     }
   };
+
+  const handleCommentAdded = useCallback(async (postId: string) => {
+    // 댓글이 추가된 후 해당 게시글의 댓글 수를 업데이트
+    try {
+      const updatedPost = await postService.getPost(postId);
+      if (updatedPost) {
+        setPosts(
+          posts.map((post) => {
+            if (post.id === postId) {
+              return {
+                ...post,
+                commentsCount: updatedPost.commentsCount,
+              };
+            }
+            return post;
+          })
+        );
+      }
+    } catch (error) {
+      console.error("댓글 수 업데이트 실패:", error);
+    }
+  }, [posts]);
 
   const handleAddPost = async (newPost: NewPost) => {
     if (!currentUser) return;
@@ -132,6 +154,7 @@ const Home: React.FC = () => {
               posts={filteredPosts}
               searchQuery={searchQuery}
               onLike={handleLike}
+              onCommentAdded={handleCommentAdded}
               currentUser={currentUser}
             />
           </div>
