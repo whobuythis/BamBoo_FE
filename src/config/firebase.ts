@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   // 여기에 Firebase 프로젝트 설정을 입력하세요
-  apiKey: "AIzaSyAzqoNOwpA9vQEwhbel1gNWMyfrW6qHyLM",
-  authDomain: "bamboo-3658e.firebaseapp.com",
-  projectId: "bamboo-3658e",
-  storageBucket: "bamboo-3658e.firebasestorage.app",
-  messagingSenderId: "940592148544",
-  appId: "1:940592148544:web:86fea4bfe320c6de752fa5",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 // Firebase 초기화
