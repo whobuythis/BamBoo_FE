@@ -1,70 +1,107 @@
-# Getting Started with Create React App
+# BamBoo_FE - React 커뮤니티 플랫폼
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+BamBoo_FE는 React와 Firebase를 사용하여 구축된 커뮤니티 플랫폼입니다.
 
-## Available Scripts
+## 주요 기능
 
-In the project directory, you can run:
+- ✅ 사용자 인증 (로그인/회원가입)
+- ✅ 게시글 작성 및 조회
+- ✅ 댓글 시스템
+- ✅ 마이페이지 (내 게시글/댓글 관리)
+- ✅ 카테고리별 게시글 필터링
+- ✅ 좋아요 기능
+- ✅ 반응형 디자인
+
+## 기술 스택
+
+- **Frontend**: React 18, TypeScript
+- **Backend**: Firebase (Authentication, Firestore)
+- **Styling**: CSS3
+- **Routing**: React Router DOM
+
+## 설치 및 실행
+
+### 1. 의존성 설치
+```bash
+npm install
+```
+
+### 2. 환경변수 설정
+프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 추가하세요:
+
+```env
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project-id.firebasestorage.app
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
+
+**⚠️ 보안 주의사항:**
+- `.env` 파일은 절대 GitHub에 업로드하지 마세요
+- `.gitignore`에 `.env`가 포함되어 있는지 확인하세요
+- 실제 Firebase 프로젝트 설정값을 사용하세요
+
+### 3. 개발 서버 실행
+```bash
+npm start
+```
+
+브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속하세요.
+
+## 프로젝트 구조
+
+```
+src/
+├── components/          # 재사용 가능한 컴포넌트
+│   ├── Header/         # 헤더 컴포넌트
+│   ├── PostCard/       # 게시글 카드 컴포넌트
+│   ├── CommentSection/ # 댓글 섹션 컴포넌트
+│   └── ...
+├── pages/              # 페이지 컴포넌트
+│   ├── Home/           # 홈 페이지
+│   ├── Login/          # 로그인 페이지
+│   ├── MyPage/         # 마이페이지
+│   └── ...
+├── services/           # API 서비스
+│   ├── postService.ts  # 게시글 관련 서비스
+│   └── userService.ts  # 사용자 관련 서비스
+├── contexts/           # React Context
+│   └── AuthContext.tsx # 인증 컨텍스트
+├── config/             # 설정 파일
+│   └── firebase.ts     # Firebase 설정
+└── types/              # TypeScript 타입 정의
+    └── index.ts        # 공통 타입들
+```
+
+## 사용 가능한 스크립트
 
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+개발 모드로 앱을 실행합니다.
+브라우저에서 [http://localhost:3000](http://localhost:3000)으로 접속하세요.
 
 ### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+테스트 러너를 대화형 감시 모드로 실행합니다.
 
 ### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+프로덕션용 앱을 `build` 폴더에 빌드합니다.
+최적화된 프로덕션 빌드가 생성됩니다.
 
 ### `npm run eject`
+**주의: 이 작업은 되돌릴 수 없습니다!**
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+빌드 도구와 설정 선택에 만족하지 못하는 경우 언제든지 `eject`할 수 있습니다.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 문제 해결
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+자세한 오류 해결 과정은 [report.md](./report.md) 파일을 참조하세요.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 라이선스
 
-## Learn More
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+*프로젝트: BamBoo_FE*
+*상태: 개발 완료 ✅*

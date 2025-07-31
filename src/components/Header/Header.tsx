@@ -79,7 +79,9 @@ const Header: React.FC<HeaderProps> = ({
 
           {currentUser ? (
             <>
-              <button className="btn btn-outline">👤 마이페이지</button>
+              <Link to="/mypage" className="btn btn-outline">
+                👤 마이페이지
+              </Link>
               <button className="btn btn-ghost" onClick={handleLogout}>
                 🚪 로그아웃
               </button>

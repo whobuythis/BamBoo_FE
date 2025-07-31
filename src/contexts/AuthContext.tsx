@@ -17,7 +17,6 @@ import {
   type User as FirebaseUser,
 } from "firebase/auth";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
-import { auth, db } from "../config/firebase";
 import type { User, AuthContextType } from "../types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -43,67 +42,96 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     password: string,
     displayName: string
   ): Promise<void> => {
-    const { user } = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    try {
+      const { auth, db } = await import("../config/firebase");
+      const { user } = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    await updateProfile(user, { displayName });
+      await updateProfile(user, { displayName });
 
-    const userData: User = {
-      uid: user.uid,
-      email: user.email!,
-      displayName,
-      createdAt: Timestamp.now(),
-    };
+      const userData: User = {
+        uid: user.uid,
+        email: user.email!,
+        displayName,
+        createdAt: Timestamp.now(),
+      };
 
-    if (user.photoURL) {
-      userData.photoURL = user.photoURL;
+      if (user.photoURL) {
+        userData.photoURL = user.photoURL;
+      }
+
+      await setDoc(doc(db, "users", user.uid), userData);
+    } catch (error) {
+      console.error("회원가입 실패:", error);
+      throw error;
     }
-
-    await setDoc(doc(db, "users", user.uid), userData);
   };
 
   const login = async (email: string, password: string): Promise<void> => {
-    await signInWithEmailAndPassword(auth, email, password);
+    try {
+      const { auth } = await import("../config/firebase");
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error("로그인 실패:", error);
+      throw error;
+    }
   };
 
   const logout = async (): Promise<void> => {
-    await signOut(auth);
+    try {
+      const { auth } = await import("../config/firebase");
+      await signOut(auth);
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
+      throw error;
+    }
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      async (firebaseUser: FirebaseUser | null) => {
-        if (firebaseUser) {
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-          if (userDoc.exists()) {
-            setCurrentUser(userDoc.data() as User);
-          } else {
-            const userData: User = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email!,
-              displayName: firebaseUser.displayName || "익명사용자",
-              createdAt: Timestamp.now(),
-            };
+    const initializeAuth = async () => {
+      try {
+        const { auth, db } = await import("../config/firebase");
+        
+        const unsubscribe = onAuthStateChanged(
+          auth,
+          async (firebaseUser: FirebaseUser | null) => {
+            if (firebaseUser) {
+              const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+              if (userDoc.exists()) {
+                setCurrentUser(userDoc.data() as User);
+              } else {
+                const userData: User = {
+                  uid: firebaseUser.uid,
+                  email: firebaseUser.email!,
+                  displayName: firebaseUser.displayName || "익명사용자",
+                  createdAt: Timestamp.now(),
+                };
 
-            if (firebaseUser.photoURL) {
-              userData.photoURL = firebaseUser.photoURL;
+                if (firebaseUser.photoURL) {
+                  userData.photoURL = firebaseUser.photoURL;
+                }
+
+                await setDoc(doc(db, "users", firebaseUser.uid), userData);
+                setCurrentUser(userData);
+              }
+            } else {
+              setCurrentUser(null);
             }
-
-            await setDoc(doc(db, "users", firebaseUser.uid), userData);
-            setCurrentUser(userData);
+            setLoading(false);
           }
-        } else {
-          setCurrentUser(null);
-        }
+        );
+
+        return unsubscribe;
+      } catch (error) {
+        console.error("Firebase 초기화 실패:", error);
         setLoading(false);
       }
-    );
+    };
 
-    return unsubscribe;
+    initializeAuth();
   }, []);
 
   const value: AuthContextType = {
