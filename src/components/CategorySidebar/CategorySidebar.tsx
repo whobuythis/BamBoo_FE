@@ -15,6 +15,7 @@ const categories: Category[] = [
   { value: "웹 개발팀", label: "웹 개발팀", icon: "👥" },
   { value: "데이터 분석팀", label: "데이터 분석팀", icon: "📊" },
   { value: "일반", label: "일반", icon: "☕" },
+  { value: "문의", label: "문의", icon: "📢" },
 ];
 
 const CategorySidebar: React.FC<CategorySidebarProps> = ({

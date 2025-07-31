@@ -87,6 +87,7 @@ const WritePostModal: React.FC<WritePostModalProps> = ({
               <option value="웹 개발팀">웹 개발팀</option>
               <option value="데이터 분석팀">데이터 분석팀</option>
               <option value="일반">일반</option>
+              <option value="문의">문의</option>
             </select>
           </div>
 
