@@ -1,0 +1,273 @@
+.post-detail-page {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 2rem 1rem;
+}
+
+.post-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back-button {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background: #f9fafb;
+}
+
+.post-detail {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.post-detail-header {
+  padding: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.post-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.category-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.category-notice {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.category-web {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.category-data {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.category-general {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.category-default {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.post-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.author-name {
+  font-weight: 500;
+  color: #374151;
+}
+
+.post-updated {
+  color: #f59e0b;
+  font-style: italic;
+}
+
+.post-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.post-content {
+  padding: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.post-content p {
+  color: #374151;
+  line-height: 1.7;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.post-actions {
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-stats {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.stat-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.stat-button:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.stat-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.stat-button.liked {
+  color: #dc2626;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.stat-icon {
+  font-size: 1rem;
+}
+
+.author-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-form {
+  margin-top: 1rem;
+}
+
+.edit-title-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.edit-content-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.edit-category-select {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  background: white;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.error-message {
+  font-size: 1.125rem;
+  color: #dc2626;
+  text-align: center;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: #16a34a;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #15803d;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+  background: #f9fafb;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}

@@ -1,66 +1,57 @@
-/* 사이드바 전체 박스 스타일 */
 .category-sidebar {
   background: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* 내용이 넘칠 경우 잘라냄 */
+  overflow: hidden;
 }
 
-/* 카테고리 제목 영역 */
 .category-header {
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
-/* 제목 텍스트 스타일 */
 .category-header h3 {
   font-size: 1.125rem;
-  font-weight: 600; /* 글자 두께 */
+  font-weight: 600;
   color: #111827;
   margin: 0;
 }
 
-/* 카테고리 목록 전체 wrapper */
 .category-list {
   padding: 0.5rem;
-  display: flex; /* Flexbox 레이아웃 */
-  flex-direction: column; /* 세로 방향 정렬 */
-  gap: 0.25rem; /* 항목 사이 간격 */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-/* 각 카테고리 버튼 기본 스타일 */
 .category-item {
-  display: flex; /* 아이콘 + 텍스트 가로 정렬 */
-  align-items: center; /* 수직 가운데 정렬 */
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
   border: none;
-  background: transparent; /* 배경 없음 */
-  border-radius: 0.375rem; /* 모서리 살짝 둥글게 */
-  cursor: pointer; /* 마우스 오버 시 포인터 표시 */
-  transition: all 0.2s; /* 모든 변화 부드럽게 0.2초 동안 */
-  text-align: left; /* 텍스트 왼쪽 정렬 */
+  background: transparent;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
   width: 100%;
 }
 
-/* 마우스 오버 시 배경색 변경 */
 .category-item:hover {
   background: #f3f4f6;
 }
 
-/* 선택된(활성화된) 카테고리 버튼 */
 .category-item.active {
   background: #16a34a;
   color: white;
 }
 
-/* 카테고리 아이콘 스타일 */
 .category-icon {
-  font-size: 1rem; /* 아이콘 크기 */
+  font-size: 1rem;
 }
 
-/* 카테고리 라벨 텍스트 스타일 */
 .category-label {
   font-size: 0.875rem;
-  font-weight: 500; /* 두께 */
+  font-weight: 500;
 }
