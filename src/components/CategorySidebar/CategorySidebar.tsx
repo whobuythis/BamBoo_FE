@@ -21,6 +21,7 @@ const categories: Category[] = [
   { value: "웹 개발팀", label: "웹 개발팀", icon: "👥" },
   { value: "데이터 분석팀", label: "데이터 분석팀", icon: "📊" },
   { value: "일반", label: "일반", icon: "☕" },
+  { value: "문의하기", label: "문의하기", icon: "💬" },
 ];
 
 // React 함수형 컴포넌트 정의 및 props 구조 분해
