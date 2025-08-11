@@ -2,6 +2,10 @@
 
 BamBoo_FE는 React와 Firebase를 사용하여 구축된 커뮤니티 플랫폼입니다.
 
+## 배포 주소
+
+[BamBoo 게시판](https://bamboo-3658e.web.app/)
+
 ## 참여자
 
 > `윤찬우` : 팀장 / Header, WritePostModal, Firebase Auth & Firestore Database
