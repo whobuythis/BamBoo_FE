@@ -9,6 +9,10 @@ const MyPage: React.FC = () => {
   const [userComments, setUserComments] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<"posts" | "comments">("posts");
   const [loading, setLoading] = useState(true);
+  const [showNicknameForm, setShowNicknameForm] = useState(false);
+  const [newNickname, setNewNickname] = useState("");
+  const [nicknameLoading, setNicknameLoading] = useState(false);
+  const [nicknameError, setNicknameError] = useState<string | null>(null);
 
   const loadUserData = useCallback(async () => {
     if (!currentUser) return;
@@ -40,6 +44,60 @@ const MyPage: React.FC = () => {
     if (!timestamp) return "";
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
     return date.toLocaleDateString("ko-KR");
+  };
+
+  const handleNicknameChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!currentUser) {
+      setNicknameError("사용자 정보를 찾을 수 없습니다.");
+      return;
+    }
+    
+    if (!newNickname.trim()) {
+      setNicknameError("닉네임을 입력해주세요.");
+      return;
+    }
+
+    if (newNickname.trim() === currentUser.displayName) {
+      setNicknameError("현재 닉네임과 동일합니다.");
+      return;
+    }
+
+    setNicknameLoading(true);
+    setNicknameError(null);
+
+    try {
+      const { userService } = await import("../../services/userService");
+      await userService.updateUser(currentUser.uid, {
+        displayName: newNickname.trim(),
+      });
+
+      // Firebase Auth의 displayName도 업데이트 (Firebase v9+ 방식)
+      try {
+        const { updateProfile } = await import("firebase/auth");
+        const { auth } = await import("../../config/firebase");
+        const firebaseUser = auth.currentUser;
+        
+        if (firebaseUser) {
+          await updateProfile(firebaseUser, {
+            displayName: newNickname.trim(),
+          });
+        }
+      } catch (authError) {
+        console.warn("Firebase Auth 업데이트 실패:", authError);
+        // Auth 업데이트 실패해도 Firestore는 업데이트되었으므로 계속 진행
+      }
+
+      setNewNickname("");
+      setShowNicknameForm(false);
+      // 페이지 새로고침으로 변경사항 반영
+      window.location.reload();
+    } catch (error) {
+      setNicknameError(error instanceof Error ? error.message : "닉네임 변경에 실패했습니다.");
+    } finally {
+      setNicknameLoading(false);
+    }
   };
 
   if (!currentUser) {
@@ -76,7 +134,60 @@ const MyPage: React.FC = () => {
             )}
           </div>
           <div className="user-details">
-            <h2>{currentUser.displayName || "사용자"}</h2>
+            <div className="nickname-section">
+              <h2>{currentUser.displayName || "사용자"}</h2>
+              <button 
+                onClick={() => {
+                  setShowNicknameForm(!showNicknameForm);
+                  setNewNickname(currentUser.displayName || "");
+                  setNicknameError(null);
+                }}
+                className="btn btn-outline btn-sm"
+              >
+                닉네임 변경
+              </button>
+            </div>
+            
+            {showNicknameForm && (
+              <form onSubmit={handleNicknameChange} className="nickname-form">
+                <div className="form-group">
+                  <input
+                    type="text"
+                    value={newNickname}
+                    onChange={(e) => setNewNickname(e.target.value)}
+                    placeholder="새 닉네임을 입력하세요"
+                    className="form-input"
+                    maxLength={20}
+                    disabled={nicknameLoading}
+                  />
+                  <div className="form-actions">
+                    <button 
+                      type="submit" 
+                      className="btn btn-primary btn-sm"
+                      disabled={nicknameLoading}
+                    >
+                      {nicknameLoading ? "변경 중..." : "변경"}
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setShowNicknameForm(false);
+                        setNewNickname("");
+                        setNicknameError(null);
+                      }}
+                      className="btn btn-secondary btn-sm"
+                      disabled={nicknameLoading}
+                    >
+                      취소
+                    </button>
+                  </div>
+                </div>
+                {nicknameError && (
+                  <div className="error-message">{nicknameError}</div>
+                )}
+              </form>
+            )}
+            
             <p>{currentUser.email}</p>
             <p>가입일: {formatDate(currentUser.createdAt)}</p>
           </div>
