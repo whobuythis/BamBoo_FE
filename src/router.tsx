@@ -5,6 +5,10 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import PostDetail from "./pages/PostDetail/PostDetail";
 import MyPage from "./pages/MyPage/MyPage";
+import Inquiry from "./pages/Inquiry/Inquiry";
+import InquiryNew from "./pages/InquiryNew/InquiryNew";
+import InquiryDetail from "./pages/InquiryDetail/InquiryDetail";
+import InquiryPassword from "./pages/InquiryPassword/InquiryPassword";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 export const router = createBrowserRouter([
@@ -35,6 +39,22 @@ export const router = createBrowserRouter([
             <MyPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "inquiry",
+        element: <Inquiry />,
+      },
+      {
+        path: "inquiry/new",
+        element: <InquiryNew />,
+      },
+      {
+        path: "inquiry/:id",
+        element: <InquiryDetail />,
+      },
+      {
+        path: "inquiry/:id/password",
+        element: <InquiryPassword />,
       },
     ],
   },

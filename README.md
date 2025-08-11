@@ -10,6 +10,11 @@ BamBoo_FE는 React와 Firebase를 사용하여 구축된 커뮤니티 플랫폼�
 - ✅ 마이페이지 (내 게시글/댓글 관리)
 - ✅ 카테고리별 게시글 필터링
 - ✅ 좋아요 기능
+- ✅ 문의하기 시스템
+  - 익명 문의 작성
+  - 비밀글 기능 (4자리 숫자 비밀번호)
+  - 관리자 답변 시스템
+  - 문의 상태 관리 (대기중/답변완료/종료)
 - ✅ 반응형 디자인
 
 ## 기술 스택
@@ -66,7 +71,8 @@ src/
 │   └── ...
 ├── services/           # API 서비스
 │   ├── postService.ts  # 게시글 관련 서비스
-│   └── userService.ts  # 사용자 관련 서비스
+│   ├── userService.ts  # 사용자 관련 서비스
+│   └── inquiryService.ts # 문의하기 관련 서비스
 ├── contexts/           # React Context
 │   └── AuthContext.tsx # 인증 컨텍스트
 ├── config/             # 설정 파일

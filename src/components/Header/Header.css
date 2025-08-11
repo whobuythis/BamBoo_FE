@@ -106,6 +106,7 @@
   gap: 0.5rem;
   text-decoration: none;
   text-align: center;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -134,6 +135,10 @@
 
 .btn-ghost:hover {
   background: #f3f4f6;
+}
+
+.btn-inquiry {
+  min-width: calc(100% + 4px);
 }
 
 @media (max-width: 768px) {

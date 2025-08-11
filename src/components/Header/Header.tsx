@@ -71,6 +71,10 @@ const Header: React.FC<HeaderProps> = ({
         )}
 
         <div className="header-actions">
+          <Link to="/inquiry" className="btn btn-outline btn-inquiry">
+            📝 문의하기
+          </Link>
+          
           {currentUser && onOpenWriteModal && (
             <button className="btn btn-primary" onClick={onOpenWriteModal}>
               ✏️ 글쓰기

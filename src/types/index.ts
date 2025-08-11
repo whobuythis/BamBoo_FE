@@ -59,3 +59,41 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   loading: boolean;
 }
+
+// 문의하기 관련 타입들
+export interface Inquiry {
+  id: string;
+  title: string;
+  content: string;
+  authorId?: string; // 익명인 경우 없음
+  authorName: string;
+  authorEmail?: string; // 익명인 경우 없음
+  isAnonymous: boolean;
+  isSecret: boolean;
+  password?: string; // 비밀글인 경우 4자리 숫자
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+  status: 'pending' | 'answered' | 'closed';
+  adminReply?: string;
+  adminReplyAt?: Timestamp;
+}
+
+export interface NewInquiry {
+  title: string;
+  content: string;
+  authorName: string;
+  authorEmail?: string;
+  isAnonymous: boolean;
+  isSecret: boolean;
+  password?: string;
+}
+
+export interface InquiryFormData {
+  title: string;
+  content: string;
+  authorName: string;
+  authorEmail: string;
+  isAnonymous: boolean;
+  isSecret: boolean;
+  password: string;
+}
