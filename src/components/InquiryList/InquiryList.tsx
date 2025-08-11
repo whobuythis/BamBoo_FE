@@ -110,7 +110,7 @@ const InquiryList: React.FC<InquiryListProps> = ({ isAdmin = false }) => {
         {!isAdmin && (
           <button
             onClick={handleWriteClick}
-            className="btn btn-primary"
+            className="btn btn-primary write-btn"
             onMouseDown={(e) => e.stopPropagation()}
           >
             문의하기 작성
@@ -124,7 +124,7 @@ const InquiryList: React.FC<InquiryListProps> = ({ isAdmin = false }) => {
           {!isAdmin && (
             <button
               onClick={handleWriteClick}
-              className="btn btn-primary"
+              className="btn btn-primary write-btn"
               onMouseDown={(e) => e.stopPropagation()}
             >
               첫 번째 문의하기 작성하기

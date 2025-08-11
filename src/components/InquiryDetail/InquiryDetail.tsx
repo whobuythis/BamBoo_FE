@@ -135,11 +135,11 @@ const InquiryDetail: React.FC = () => {
 
   return (
     <div className="inquiry-detail-container">
-      <div className="inquiry-header">
-        <button onClick={() => navigate('/inquiry')} className="btn btn-outline">
+      <div className="inquiry-detail-header">
+        <h1>{inquiry.title}</h1>
+        <button onClick={() => navigate('/inquiry')} className="btn btn-outline back-btn">
           ← 목록으로
         </button>
-        <h1>{inquiry.title}</h1>
       </div>
 
       <div className="inquiry-content">
