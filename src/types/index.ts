@@ -83,6 +83,7 @@ export interface NewInquiry {
   content: string;
   authorName: string;
   authorEmail?: string;
+  authorId?: string;
   isAnonymous: boolean;
   isSecret: boolean;
   password?: string;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { createInquiry } from '../../services/inquiryService';
-import { InquiryFormData } from '../../types';
+import { InquiryFormData, NewInquiry } from '../../types';
 import './InquiryForm.css';
 
 interface InquiryFormProps {
@@ -85,16 +85,26 @@ const InquiryForm: React.FC<InquiryFormProps> = ({ onSuccess, onCancel }) => {
     setLoading(true);
 
     try {
-      const inquiryData = {
+      const inquiryData: NewInquiry = {
         title: formData.title.trim(),
         content: formData.content.trim(),
         authorName: formData.isAnonymous ? '익명' : formData.authorName.trim(),
-        authorEmail: formData.isAnonymous ? undefined : formData.authorEmail.trim(),
-        authorId: formData.isAnonymous ? undefined : currentUser?.uid,
         isAnonymous: formData.isAnonymous,
         isSecret: formData.isSecret,
-        password: formData.isSecret ? formData.password : undefined
       };
+
+      // 익명이 아닌 경우에만 authorEmail과 authorId 추가
+      if (!formData.isAnonymous) {
+        inquiryData.authorEmail = formData.authorEmail.trim();
+        if (currentUser?.uid) {
+          inquiryData.authorId = currentUser.uid;
+        }
+      }
+
+      // 비밀글인 경우에만 password 추가
+      if (formData.isSecret) {
+        inquiryData.password = formData.password;
+      }
 
       await createInquiry(inquiryData);
       

@@ -3,11 +3,13 @@
 ## 개요
 BamBoo_FE React 프로젝트에서 발생한 다양한 오류들을 순차적으로 해결한 과정을 정리한 보고서입니다.
 
-## 최근 업데이트 (2025-01-30)
+## 최근 업데이트 (2025-08-11)
 - Firebase Hosting 배포 후 발생한 `createRoot` 및 `firebase is not defined` 오류 해결
 - React 앱을 위한 올바른 `index.html` 설정
 - Firebase Hosting 환경에서의 환경변수 처리 개선
 - **하드코딩된 API 키 제거 및 .env 파일 사용으로 복원**
+- **문의하기 기능 구현 및 배포 후 Firestore undefined 값 오류 해결**
+- **마이페이지 닉네임 변경 기능 추가**
 
 ## 1. 초기 의존성 충돌 문제
 
@@ -2463,9 +2465,527 @@ npm install react-router-dom@^7.0.0
 
 ---
 
+---
+
+## 23. 문의하기 기능 구현 및 배포 후 Firestore 오류 해결
+
+### 문제 상황
+배포된 사이트에서 문의하기 기능 사용 시 다음 오류 발생:
+```
+FirebaseError: Function addDoc() called with invalid data. Unsupported field value: undefined (found in field password in document inquiries/FSaihGcM8S5w7dGzoHZ8)
+```
+
+### 원인 분석
+1. **Firestore undefined 값 오류**: Firestore는 `undefined` 값을 허용하지 않음
+2. **조건부 필드 처리 문제**: 익명 글 작성 시 `authorEmail`, `authorId`가 `undefined`로 설정
+3. **비밀글 비밀번호 처리 문제**: 비밀글이 아닌 경우 `password`가 `undefined`로 설정
+
+### 해결 방법
+
+#### 1. inquiryService.ts 수정
+**수정 전:**
+```typescript
+export const createInquiry = async (inquiryData: NewInquiry): Promise<string> => {
+  try {
+    const docRef = await addDoc(collection(db, INQUIRIES_COLLECTION), {
+      ...inquiryData,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      status: 'pending' as const
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating inquiry:', error);
+    throw new Error('문의하기 작성에 실패했습니다.');
+  }
+};
+```
+
+**수정 후:**
+```typescript
+export const createInquiry = async (inquiryData: NewInquiry): Promise<string> => {
+  try {
+    // undefined 값과 빈 문자열을 제거
+    const cleanData = Object.fromEntries(
+      Object.entries(inquiryData).filter(([_, value]) => {
+        return value !== undefined && value !== null && value !== '';
+      })
+    );
+    
+    const docRef = await addDoc(collection(db, INQUIRIES_COLLECTION), {
+      ...cleanData,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+      status: 'pending' as const
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating inquiry:', error);
+    throw new Error('문의하기 작성에 실패했습니다.');
+  }
+};
+```
+
+#### 2. InquiryForm.tsx 수정
+**수정 전:**
+```typescript
+const inquiryData = {
+  title: formData.title.trim(),
+  content: formData.content.trim(),
+  authorName: formData.isAnonymous ? '익명' : formData.authorName.trim(),
+  authorEmail: formData.isAnonymous ? undefined : formData.authorEmail.trim(),
+  authorId: formData.isAnonymous ? undefined : currentUser?.uid,
+  isAnonymous: formData.isAnonymous,
+  isSecret: formData.isSecret,
+  password: formData.isSecret ? formData.password : undefined
+};
+```
+
+**수정 후:**
+```typescript
+const inquiryData: NewInquiry = {
+  title: formData.title.trim(),
+  content: formData.content.trim(),
+  authorName: formData.isAnonymous ? '익명' : formData.authorName.trim(),
+  isAnonymous: formData.isAnonymous,
+  isSecret: formData.isSecret,
+};
+
+// 익명이 아닌 경우에만 authorEmail과 authorId 추가
+if (!formData.isAnonymous) {
+  inquiryData.authorEmail = formData.authorEmail.trim();
+  if (currentUser?.uid) {
+    inquiryData.authorId = currentUser.uid;
+  }
+}
+
+// 비밀글인 경우에만 password 추가
+if (formData.isSecret) {
+  inquiryData.password = formData.password;
+}
+```
+
+#### 3. types/index.ts 수정
+**NewInquiry 타입에 authorId 필드 추가:**
+```typescript
+export interface NewInquiry {
+  title: string;
+  content: string;
+  authorName: string;
+  authorEmail?: string;
+  authorId?: string;
+  isAnonymous: boolean;
+  isSecret: boolean;
+  password?: string;
+}
+```
+
+### 결과
+✅ Firestore undefined 값 오류 해결
+✅ 문의하기 기능 정상 작동
+✅ 익명 글 작성 기능 정상 작동
+✅ 비밀글 기능 정상 작동
+✅ 배포된 사이트에서 모든 기능 정상 작동
+
+---
+
+## 24. 마이페이지 닉네임 변경 기능 추가
+
+### 요구사항
+- 로그인한 사용자가 본인의 닉네임을 변경할 수 있는 기능
+- 마이페이지에서 닉네임 변경 버튼 클릭 시 폼 표시
+- Firestore와 Firebase Auth 모두 업데이트
+
+### 구현 방법
+
+#### 1. MyPage.tsx 수정
+**상태 추가:**
+```typescript
+const [showNicknameForm, setShowNicknameForm] = useState(false);
+const [newNickname, setNewNickname] = useState("");
+const [nicknameLoading, setNicknameLoading] = useState(false);
+const [nicknameError, setNicknameError] = useState<string | null>(null);
+```
+
+**닉네임 변경 핸들러:**
+```typescript
+const handleNicknameChange = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!currentUser) {
+    setNicknameError("사용자 정보를 찾을 수 없습니다.");
+    return;
+  }
+  
+  if (!newNickname.trim()) {
+    setNicknameError("닉네임을 입력해주세요.");
+    return;
+  }
+
+  if (newNickname.trim() === currentUser.displayName) {
+    setNicknameError("현재 닉네임과 동일합니다.");
+    return;
+  }
+
+  setNicknameLoading(true);
+  setNicknameError(null);
+
+  try {
+    const { userService } = await import("../../services/userService");
+    await userService.updateUser(currentUser.uid, {
+      displayName: newNickname.trim(),
+    });
+
+    // Firebase Auth의 displayName도 업데이트 (Firebase v9+ 방식)
+    try {
+      const { updateProfile } = await import("firebase/auth");
+      const { auth } = await import("../../config/firebase");
+      const firebaseUser = auth.currentUser;
+      
+      if (firebaseUser) {
+        await updateProfile(firebaseUser, {
+          displayName: newNickname.trim(),
+        });
+      }
+    } catch (authError) {
+      console.warn("Firebase Auth 업데이트 실패:", authError);
+      // Auth 업데이트 실패해도 Firestore는 업데이트되었으므로 계속 진행
+    }
+
+    setNewNickname("");
+    setShowNicknameForm(false);
+    // 페이지 새로고침으로 변경사항 반영
+    window.location.reload();
+  } catch (error) {
+    setNicknameError(error instanceof Error ? error.message : "닉네임 변경에 실패했습니다.");
+  } finally {
+    setNicknameLoading(false);
+  }
+};
+```
+
+**UI 추가:**
+```typescript
+<div className="nickname-section">
+  <h2>{currentUser.displayName || "사용자"}</h2>
+  <button 
+    onClick={() => {
+      setShowNicknameForm(!showNicknameForm);
+      setNewNickname(currentUser.displayName || "");
+      setNicknameError(null);
+    }}
+    className="btn btn-outline btn-sm"
+  >
+    닉네임 변경
+  </button>
+</div>
+
+{showNicknameForm && (
+  <form onSubmit={handleNicknameChange} className="nickname-form">
+    <div className="form-group">
+      <input
+        type="text"
+        value={newNickname}
+        onChange={(e) => setNewNickname(e.target.value)}
+        placeholder="새 닉네임을 입력하세요"
+        className="form-input"
+        maxLength={20}
+        disabled={nicknameLoading}
+      />
+      <div className="form-actions">
+        <button 
+          type="submit" 
+          className="btn btn-primary btn-sm"
+          disabled={nicknameLoading}
+        >
+          {nicknameLoading ? "변경 중..." : "변경"}
+        </button>
+        <button 
+          type="button" 
+          onClick={() => {
+            setShowNicknameForm(false);
+            setNewNickname("");
+            setNicknameError(null);
+          }}
+          className="btn btn-secondary btn-sm"
+          disabled={nicknameLoading}
+        >
+          취소
+        </button>
+      </div>
+    </div>
+    {nicknameError && (
+      <div className="error-message">{nicknameError}</div>
+    )}
+  </form>
+)}
+```
+
+#### 2. MyPage.css 스타일 추가
+```css
+.nickname-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.nickname-section h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.nickname-form {
+  margin: 16px 0;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #545b62;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #f5c6cb;
+  font-size: 12px;
+  margin-top: 8px;
+}
+```
+
+### 결과
+✅ 마이페이지 닉네임 변경 기능 구현
+✅ Firestore 사용자 정보 업데이트
+✅ Firebase Auth displayName 업데이트
+✅ 유효성 검사 및 에러 처리
+✅ 반응형 디자인 적용
+✅ TypeScript 타입 안전성 확보
+
+---
+
+## 25. TypeScript 오류 해결
+
+### 문제 상황
+마이페이지 닉네임 변경 기능 구현 시 TypeScript 오류 발생:
+```
+TS18047: 'currentUser' is possibly 'null'.
+TS2339: Property 'updateProfile' does not exist on type 'User'.
+```
+
+### 원인 분석
+1. **currentUser null 체크 부족**: `currentUser`가 `null`일 수 있는 상황 처리 필요
+2. **Firebase Auth User 타입 문제**: 우리가 정의한 `User` 타입과 Firebase Auth의 `User` 타입 혼동
+
+### 해결 방법
+
+#### 1. currentUser null 체크 추가
+```typescript
+const handleNicknameChange = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  if (!currentUser) {
+    setNicknameError("사용자 정보를 찾을 수 없습니다.");
+    return;
+  }
+  // ... 나머지 로직
+};
+```
+
+#### 2. Firebase Auth updateProfile 올바른 사용법
+```typescript
+// Firebase Auth의 displayName도 업데이트 (Firebase v9+ 방식)
+try {
+  const { updateProfile } = await import("firebase/auth");
+  const { auth } = await import("../../config/firebase");
+  const firebaseUser = auth.currentUser;
+  
+  if (firebaseUser) {
+    await updateProfile(firebaseUser, {
+      displayName: newNickname.trim(),
+    });
+  }
+} catch (authError) {
+  console.warn("Firebase Auth 업데이트 실패:", authError);
+  // Auth 업데이트 실패해도 Firestore는 업데이트되었으므로 계속 진행
+}
+```
+
+### 결과
+✅ TypeScript 컴파일 오류 해결
+✅ 타입 안전성 확보
+✅ Firebase Auth 올바른 사용법 적용
+✅ 에러 처리 강화
+
+---
+
+## 26. 최종 상태 업데이트
+
+### 해결된 문제들
+1. ✅ npm 의존성 충돌 해결
+2. ✅ Firebase 패키지 설치
+3. ✅ 환경변수 형식 수정
+4. ✅ 순환 참조 문제 해결
+5. ✅ ESLint 경고 해결
+6. ✅ Firebase 인덱스 오류 해결
+7. ✅ 마이페이지 기능 구현
+8. ✅ 댓글 기능 개선
+9. ✅ 사용자 서비스 추가
+10. ✅ 게시글 수정/삭제 기능 구현
+11. ✅ 게시글 목록에서 댓글 확장 기능 구현
+12. ✅ 댓글 수정/삭제 기능 구현
+13. ✅ ESLint React Hook 오류 해결
+14. ✅ React Router 구조 개선
+15. ✅ TypeScript 컴파일 에러 해결
+16. ✅ Firebase Hosting 배포 오류 해결
+17. ✅ 하드코딩된 API 키 제거 및 보안 강화
+18. ✅ **문의하기 기능 구현 및 Firestore 오류 해결**
+19. ✅ **마이페이지 닉네임 변경 기능 추가**
+20. ✅ **TypeScript 오류 해결**
+
+### 현재 상태
+- 🟢 개발 서버 정상 실행
+- 🟢 Firebase 연결 성공
+- 🟢 모든 기능 정상 작동
+- 🟢 TypeScript 컴파일 에러 없음
+- 🟢 게시글 관리 기능 완성
+- 🟢 댓글 확장 기능 완성
+- 🟢 댓글 수정/삭제 기능 완성
+- 🟢 ESLint 오류 완전 해결
+- 🟢 Firebase Hosting 배포 성공
+- 🟢 보안 강화 (하드코딩된 API 키 제거)
+- 🟢 **문의하기 기능 완성**
+- 🟢 **마이페이지 닉네임 변경 기능 완성**
+- 🟡 React Router Future Flag 경고 (기능상 문제 없음)
+
+### 배포 정보
+- **배포 URL**: https://bamboo-3658e.web.app
+- **Firebase 프로젝트**: bamboo-3658e
+- **호스팅 상태**: 정상 운영 중
+- **보안 상태**: API 키 하드코딩 제거 완료
+- **문의하기 기능**: 정상 작동
+- **닉네임 변경 기능**: 정상 작동
+
+### 구현된 주요 기능들
+1. **게시글 시스템**
+   - 게시글 작성, 조회, 수정, 삭제
+   - 카테고리별 분류
+   - 좋아요 기능
+   - 댓글 시스템
+
+2. **사용자 관리**
+   - 회원가입, 로그인, 로그아웃
+   - 마이페이지
+   - 닉네임 변경 기능
+   - 사용자별 게시글/댓글 관리
+
+3. **댓글 시스템**
+   - 댓글 작성, 수정, 삭제
+   - 게시글 목록에서 댓글 확장
+   - 실시간 댓글 수 업데이트
+
+4. **문의하기 시스템**
+   - 익명 글 작성
+   - 비밀글 기능 (4자리 비밀번호)
+   - 관리자 답변 기능
+   - 상태 관리 (대기중, 답변완료, 종료)
+
+5. **관리자 기능**
+   - 문의하기 답변
+   - 문의 상태 변경
+   - 문의 삭제
+
+### 기술적 성과
+- **React 18 + TypeScript** 기반 안정적인 웹 애플리케이션
+- **Firebase** 백엔드 서비스 완전 활용
+- **Firestore** 실시간 데이터베이스 연동
+- **Firebase Hosting** 성공적 배포
+- **반응형 디자인** 모바일/데스크톱 호환
+- **보안 강화** 환경변수 기반 설정
+
+---
+
 *보고서 작성일: 2025-01-30*
 *프로젝트: BamBoo_FE*
-*상태: 모든 오류 해결 완료, 배포 성공, 보안 강화 완료 ✅*
+*상태: 모든 오류 해결 완료, 배포 성공, 보안 강화 완료, 문의하기 기능 완성, 닉네임 변경 기능 완성 ✅*
 
 ---
 

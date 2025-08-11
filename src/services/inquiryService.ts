@@ -18,8 +18,15 @@ const INQUIRIES_COLLECTION = 'inquiries';
 // 문의하기 작성
 export const createInquiry = async (inquiryData: NewInquiry): Promise<string> => {
   try {
+    // undefined 값과 빈 문자열을 제거
+    const cleanData = Object.fromEntries(
+      Object.entries(inquiryData).filter(([_, value]) => {
+        return value !== undefined && value !== null && value !== '';
+      })
+    );
+    
     const docRef = await addDoc(collection(db, INQUIRIES_COLLECTION), {
-      ...inquiryData,
+      ...cleanData,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       status: 'pending' as const
