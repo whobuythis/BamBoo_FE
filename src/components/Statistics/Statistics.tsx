@@ -43,6 +43,10 @@ const Statistics: React.FC<StatisticsProps> = ({ posts }) => {
           <span className="stat-label">일반</span>
           <span className="stat-value">{getPostCountByCategory("일반")}</span>
         </div>
+        <div className="stat-item">
+          <span className="stat-label">문의</span>
+          <span className="stat-value">{getPostCountByCategory("문의")}</span>
+        </div>
       </div>
     </div>
   );
