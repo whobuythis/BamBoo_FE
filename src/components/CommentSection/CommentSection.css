@@ -6,7 +6,7 @@
 }
 
 .comment-header {
-  padding: 1.5rem 2rem 1rem 2rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -81,10 +81,6 @@
 .comment-item {
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #f3f4f6;
-}
-
-.comment-item:last-child {
-  border-bottom: none;
 }
 
 .comment-header-info {

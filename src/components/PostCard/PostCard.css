@@ -231,9 +231,9 @@
   border: 1px solid #e5e7eb;
 }
 
-.comment-item:last-child {
+/* .comment-item:last-child {
   margin-bottom: 0;
-}
+} */
 
 .comment-header {
   display: flex;
